@@ -1283,6 +1283,13 @@ body.edit-mode .cover-full-tools{display:flex;}
 </style><meta id="bbafmabaelnnkondpfpjmdklbmfnbmol"><meta id="dcngeagmmhegagicpcmpinaoklddcgon"></head>
 
 
+<style id="destaques-correcao">
+/* card sem texto: não mostra "Ler texto completo" */
+body:not(.edit-mode) #publicacoesGrid > .card.cx-no-text::after, body:not(.edit-mode) #publicacoesGridPerfumes > .card.cx-no-text::after,
+body:not(.edit-mode) #destaquesGrid > .card.cx-no-text::after, body:not(.edit-mode) #destaquesGridPerfumes > .card.cx-no-text::after,
+body:not(.edit-mode) #aconteceuGrid > .card.cx-no-text::after, body:not(.edit-mode) #aconteceuGridPerfumes > .card.cx-no-text::after{content:none !important;}
+body:not(.edit-mode) .card.cx-no-text{cursor:default !important;}
+</style>
 <body class="">
 <button aria-label="Abrir menu de navegação" id="navToggle" type="button">☰</button>
 <nav aria-label="Navegação entre páginas" id="sideNav">
@@ -1398,7 +1405,7 @@ body.edit-mode .cover-full-tools{display:flex;}
 <div class="lbl2">Adicionar foto</div>
 </label>
 <div class="handle-tag" contenteditable="false" data-cx-blur-bound="1" data-cx-editable="true">@cardim_paisagismo</div>
-<p contenteditable="false" data-cx-blur-bound="1" data-cx-editable="true" style="font-size:12px; color:var(--ink-soft); line-height:1.6; text-align:left; margin-top:8px;"><div>Ontem inauguramos nosso projeto de paisagismo sustentável e brasileiro para o Bosque Tania Bulhões, a nova fábrica de porcelanas e perfumaria da marca em Uberaba, Minas Gerais.</div><div>Um paisagismo que valoriza a biodiversidade e as paisagens nativas da região, onde Cerrado e Mata Atlântica formam um rico mosaico de vegetações nativas, e inspirado também no Grande Sertão: Veredas, de Guimarães Rosa, com espelho d’água e buritis sobre plantas aquáticas nativas. Nas margens, palmeiras como os bacuris e grandes árvores como pequizeiros, jatobás e jequitibás-brancos. Em volta, Florestas de Bolso e capinzais nativos. A paisagem mineral também é protagonista, com a pedra tapiocanga, característica de Uberaba e utilizada historicamente na construção da Igreja de São Domingos, presente em revestimentos e praças, e junto às bromélias porto-seguro-amarelas. Um paisagismo que apresenta a identidade ancestral da natureza regional, com sombra generosa e a beleza da maior biodiversidade do mundo.</div></p>
+<p contenteditable="false" data-cx-blur-bound="1" data-cx-editable="true" style="font-size:12px; color:var(--ink-soft); line-height:1.6; text-align:left; margin-top:8px;">Ontem inauguramos nosso projeto de paisagismo sustentável e brasileiro para o Bosque Tania Bulhões, a nova fábrica de porcelanas e perfumaria da marca em Uberaba, Minas Gerais.<br><br>Um paisagismo que valoriza a biodiversidade e as paisagens nativas da região, onde Cerrado e Mata Atlântica formam um rico mosaico de vegetações nativas, e inspirado também no Grande Sertão: Veredas, de Guimarães Rosa, com espelho d’água e buritis sobre plantas aquáticas nativas. Nas margens, palmeiras como os bacuris e grandes árvores como pequizeiros, jatobás e jequitibás-brancos. Em volta, Florestas de Bolso e capinzais nativos. A paisagem mineral também é protagonista, com a pedra tapiocanga, característica de Uberaba e utilizada historicamente na construção da Igreja de São Domingos, presente em revestimentos e praças, e junto às bromélias porto-seguro-amarelas. Um paisagismo que apresenta a identidade ancestral da natureza regional, com sombra generosa e a beleza da maior biodiversidade do mundo.</p>
 </div>
 </div>
 </div>
@@ -4348,5 +4355,43 @@ A influenciadora compartilhou a inauguração da nova loja Tania Bulhões no Bal
   new MutationObserver(showSize).observe(document.body, {attributes:true, attributeFilter:['class']});
 })();
 
+</script>
+<script id="destaques-correcao-script">
+(function(){
+  var GRIDS = ['publicacoesGrid','destaquesGrid','aconteceuGrid','publicacoesGridPerfumes','destaquesGridPerfumes','aconteceuGridPerfumes'];
+  function cards(){ var out=[]; GRIDS.forEach(function(id){ var g=document.getElementById(id); if(g) out=out.concat([].slice.call(g.children).filter(function(c){return c.classList.contains('card');})); }); return out; }
+  // Conserta cards em que o texto foi parar fora do parágrafo (blocos <div> soltos após colar texto)
+  function repair(card){
+    var p = card.querySelector('p'); if(!p) return;
+    var stray = [].slice.call(card.children).filter(function(n){ return n !== p && n.tagName === 'DIV' && !n.classList.contains('handle-tag') && !n.classList.contains('tag') && !n.classList.contains('photo-slot') && !n.querySelector('input,button,label') && n.textContent.trim(); });
+    var extraP = [].slice.call(card.querySelectorAll('p')).slice(1);
+    if(!stray.length && !extraP.length) return;
+    var parts = [];
+    if(p.textContent.trim()) parts.push(p.innerHTML);
+    stray.concat(extraP).forEach(function(n){ if(n.textContent.trim()) parts.push(n.innerHTML); n.remove(); });
+    p.innerHTML = parts.join('<br><br>');
+  }
+  function mark(card){ var p = card.querySelector('p'); card.classList.toggle('cx-no-text', !(p && p.textContent.trim())); }
+  function run(){ cards().forEach(function(c){ repair(c); mark(c); }); }
+  run();
+  document.addEventListener('focusout', function(){ setTimeout(function(){ cards().forEach(mark); }, 0); }, true);
+  new MutationObserver(function(){ cards().forEach(mark); }).observe(document.body, {attributes:true, attributeFilter:['class']});
+  // Colar e Enter nos textos editáveis: mantém tudo dentro do mesmo campo (sem criar blocos soltos)
+  document.addEventListener('paste', function(e){
+    var el = e.target && e.target.closest && e.target.closest('[contenteditable="true"]');
+    if(!el || !e.clipboardData) return;
+    var txt = e.clipboardData.getData('text/plain'); if(!txt) return;
+    e.preventDefault();
+    var html = txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\r\n?/g,'\n').replace(/\n/g,'<br>');
+    document.execCommand('insertHTML', false, html);
+  }, true);
+  document.addEventListener('keydown', function(e){
+    if(e.key !== 'Enter' || e.shiftKey) return;
+    var el = e.target && e.target.closest && e.target.closest('p[contenteditable="true"]');
+    if(!el) return;
+    e.preventDefault();
+    document.execCommand('insertLineBreak');
+  }, true);
+})();
 </script>
 </body></html>
