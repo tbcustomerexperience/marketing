@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-cx-saved="1794405899933" lang="pt-BR"><head><meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<html data-cx-saved="1794406727367" lang="pt-BR"><head><meta content="text/html; charset=utf-8" http-equiv="Content-Type">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>Redes Sociais · Tania Bulhões · Outubro 2026</title>
 <link href="https://fonts.googleapis.com/" rel="preconnect">
@@ -2005,7 +2005,7 @@ A influenciadora compartilhou a inauguração da nova loja Tania Bulhões no Bal
   // ===== edit mode =====
   const editBtn = document.getElementById('editBtn');
   const saveNote = document.getElementById('saveNote');
-  const STORAGE_KEY = 'cx-overview-set26-edits-v3-capa-redes-v2';
+  const STORAGE_KEY = 'cx-overview-set26-edits-v3-capa-redes-v3';
 
   // Registra todos os campos permitidos para edição.
   // Além dos campos já marcados no HTML, todos os textos dos cards KPI ficam editáveis
@@ -2068,7 +2068,7 @@ A influenciadora compartilhou a inauguração da nova loja Tania Bulhões no Bal
   });
 
   // ===== estado de imagens e cards =====
-  const MEDIA_STATE_KEY = 'cx-overview-set26-media-state-v3-capa-redes';
+  const MEDIA_STATE_KEY = 'cx-overview-set26-media-state-v3-capa-redes-v3';
 
   // ===== Proteção das edições guardadas no navegador =====
   // As edições locais são gravadas pela POSIÇÃO do campo. Se o arquivo mudou (linhas/cards a mais ou a menos, outra versão
@@ -2182,7 +2182,7 @@ A influenciadora compartilhou a inauguração da nova loja Tania Bulhões no Bal
 
 
   // ===== canais do ranking editáveis =====
-  const CHANNELS_KEY = 'cx-overview-jul26-ranking-channels-capa-redes-v2';
+  const CHANNELS_KEY = 'cx-overview-jul26-ranking-channels-capa-redes-v3';
 
   function normalizeChannelBadge(el){
     const value = (el.textContent || '').trim().toUpperCase().replace(/\s+/g,'').slice(0,3) || 'IG';
@@ -4373,7 +4373,26 @@ A influenciadora compartilhou a inauguração da nova loja Tania Bulhões no Bal
   }
   function mark(card){ var p = card.querySelector('p'); card.classList.toggle('cx-no-text', !(p && p.textContent.trim())); }
   function run(){ cards().forEach(function(c){ repair(c); mark(c); }); }
-  run();
+  // Botão de excluir (×) também nos cards de Destaques, e funcionando em todos os cards
+  function ensureRemove(){
+    cards().forEach(function(card){
+      if(!card.querySelector(':scope > .remove-card-btn')){
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'remove-card-btn'; b.title = 'Excluir card'; b.textContent = '×';
+        card.insertBefore(b, card.firstChild);
+      }
+    });
+  }
+  document.addEventListener('click', function(e){
+    var b = e.target && e.target.closest && e.target.closest('.remove-card-btn');
+    if(!b || b.hasAttribute('onclick')) return;
+    if(!document.body.classList.contains('edit-mode')) return;
+    e.preventDefault(); e.stopPropagation();
+    if(typeof removeMediaCard === 'function') removeMediaCard(b);
+    else { var c = b.closest('.card'); if(c) c.remove(); }
+  });
+  run(); ensureRemove();
+  new MutationObserver(ensureRemove).observe(document.getElementById('destaquesGrid') || document.body, {childList:true});
   document.addEventListener('focusout', function(){ setTimeout(function(){ cards().forEach(mark); }, 0); }, true);
   new MutationObserver(function(){ cards().forEach(mark); }).observe(document.body, {attributes:true, attributeFilter:['class']});
   // Colar e Enter nos textos editáveis: mantém tudo dentro do mesmo campo (sem criar blocos soltos)
