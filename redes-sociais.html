@@ -1273,6 +1273,17 @@ body.edit-mode .cover-full-tools{display:flex;}
 @media print{ .mural-slide .mi-card{animation:none !important; opacity:1 !important;} }
 
 </style>
+<style id="mural-padronizacao-final">
+/* Mural: mesmo fundo e mesmas fontes das demais páginas */
+.slide.mural-slide{background:var(--page-off-white,#FCFBF8) !important;}
+.mural-slide .press-kicker,.mural-slide .press-intro,.mural-slide .press-counter span,.mural-slide .press-feature-label,
+.mural-slide .press-feature-source,.mural-slide .press-feature-copy p,.mural-slide .press-list-header,.mural-slide .press-source,
+.mural-slide .press-story h3,.mural-slide .press-story p,.mural-slide .press-footer,.mural-slide .press-date{font-family:inherit !important;}
+.mural-slide .press-h{font-family:'Cormorant Garamond',serif !important;font-style:italic;font-weight:500;font-size:32px;letter-spacing:0;color:var(--green-deep);}
+.mural-slide .press-h em{font-style:italic;font-weight:500;}
+.mural-slide .press-counter strong{font-family:'Cormorant Garamond',serif !important;font-style:italic;font-weight:500;font-size:44px;}
+.mural-slide .press-feature-copy h3{font-family:'Cormorant Garamond',serif !important;font-weight:500;font-size:24px;line-height:1.2;}
+</style>
 <body class="">
 <button aria-label="Abrir menu de navegação" id="navToggle" type="button">☰</button>
 <nav aria-label="Navegação entre páginas" id="sideNav">
@@ -1988,7 +1999,7 @@ A influenciadora compartilhou a inauguração da nova loja Tania Bulhões no Bal
   // ===== edit mode =====
   const editBtn = document.getElementById('editBtn');
   const saveNote = document.getElementById('saveNote');
-  const STORAGE_KEY = 'cx-overview-set26-edits-v3-capa-redes';
+  const STORAGE_KEY = 'cx-overview-set26-edits-v3-capa-redes-v2';
 
   // Registra todos os campos permitidos para edição.
   // Além dos campos já marcados no HTML, todos os textos dos cards KPI ficam editáveis
@@ -2165,7 +2176,7 @@ A influenciadora compartilhou a inauguração da nova loja Tania Bulhões no Bal
 
 
   // ===== canais do ranking editáveis =====
-  const CHANNELS_KEY = 'cx-overview-jul26-ranking-channels-capa-redes';
+  const CHANNELS_KEY = 'cx-overview-jul26-ranking-channels-capa-redes-v2';
 
   function normalizeChannelBadge(el){
     const value = (el.textContent || '').trim().toUpperCase().replace(/\s+/g,'').slice(0,3) || 'IG';
